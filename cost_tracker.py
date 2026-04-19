@@ -1,12 +1,7 @@
 MODEL_COST = {
-    "gemini-1.5-flash": {
-        "input": 0.00015,
-        "output": 0.0006
-    },
-    "groq-llama3-8b": {
-        "input": 0.00005,
-        "output": 0.0001
-    }
+    "gemini-flash": {"input": 0.00015, "output": 0.0006},
+    "groq-llama": {"input": 0.00005, "output": 0.0001},
+    "together-mixtral": {"input": 0.00006, "output": 0.00012}
 }
 
 def calculate_cost(model, input_tokens, output_tokens):
