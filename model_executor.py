@@ -9,31 +9,60 @@ def call_model(model_name, prompt):
     start = time.time()
 
     try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={os.getenv('GEMINI_API_KEY')}"
+        # ================= GEMINI =================
+        if "gemini" in model_name:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={os.getenv('GEMINI_API_KEY')}"
 
-        response = requests.post(
-            url,
-            headers={"Content-Type": "application/json"},
-            json={
-                "contents": [
-                    {
-                        "parts": [{"text": prompt}]
-                    }
-                ]
-            }
-        )
+            response = requests.post(
+                url,
+                headers={"Content-Type": "application/json"},
+                json={
+                    "contents": [{"parts": [{"text": prompt}]}]
+                }
+            )
+
+            data = response.json()
+
+            if response.status_code != 200:
+                raise Exception(data)
+
+            text = data["candidates"][0]["content"]["parts"][0]["text"]
+
+            # Gemini → estimated tokens
+            input_tokens = len(prompt.split())
+            output_tokens = len(text.split())
+
+        # ================= GROQ =================
+        elif "groq" in model_name:
+            url = "https://api.groq.com/openai/v1/chat/completions"
+
+            response = requests.post(
+                url,
+                headers={
+                    "Authorization": f"Bearer {os.getenv('GROQ_API_KEY')}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "llama3-70b-8192",
+                    "messages": [{"role": "user", "content": prompt}]
+                }
+            )
+
+            data = response.json()
+
+            if response.status_code != 200:
+                raise Exception(data)
+
+            text = data["choices"][0]["message"]["content"]
+
+            usage = data.get("usage", {})
+            input_tokens = usage.get("prompt_tokens", len(prompt.split()))
+            output_tokens = usage.get("completion_tokens", len(text.split()))
+
+        else:
+            raise Exception("Unknown model type")
 
         end = time.time()
-        data = response.json()
-
-        if response.status_code != 200:
-            raise Exception(f"API Error: {data}")
-
-        text = data["candidates"][0]["content"]["parts"][0]["text"]
-
-        # Gemini does not return tokens → estimate
-        input_tokens = len(prompt.split())
-        output_tokens = len(text.split())
 
         return {
             "response": text,

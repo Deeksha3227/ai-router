@@ -1,7 +1,11 @@
 MODEL_COST = {
-    "gpt-4o-mini": {
+    "gemini-1.5-flash": {
         "input": 0.00015,
         "output": 0.0006
+    },
+    "groq-llama3-8b": {
+        "input": 0.00005,
+        "output": 0.0001
     }
 }
 

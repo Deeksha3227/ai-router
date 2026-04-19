@@ -1,18 +1,17 @@
 def route_prompt(prompt):
     prompt_lower = prompt.lower()
 
-    # Very basic rule-based routing (temporary)
     if "code" in prompt_lower or "python" in prompt_lower:
         return {
-            "model": "gemini-1.5-flash",
+            "model": "llama3-70b-8192",
             "category": "CODE",
             "complexity": "Easy"
         }
 
-    elif "image" in prompt_lower:
+    elif "explain" in prompt_lower or "analysis" in prompt_lower:
         return {
             "model": "gemini-1.5-flash",
-            "category": "IMAGE",
+            "category": "ANALYSIS",
             "complexity": "Medium"
         }
 
